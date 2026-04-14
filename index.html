@@ -61,24 +61,24 @@ header p{font-size:12px;color:var(--arc-gray-300);margin-top:1px;font-family:var
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:var(--arc-cream)}
 ::-webkit-scrollbar-thumb{background:var(--arc-gray-300)}
-#welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px}
-#welcome-modal{background:var(--arc-white);max-width:380px;width:100%;border-top:4px solid var(--arc-red);padding:28px 24px 20px;position:relative}
-#welcome-modal h2{font-family:var(--font-headline);font-size:22px;font-weight:700;color:var(--arc-black);margin-bottom:16px}
-#welcome-modal p{font-size:14px;line-height:1.6;color:var(--arc-gray-700);margin-bottom:12px}
-#welcome-modal .tip{font-size:13px;color:var(--arc-gray-500);font-style:italic;margin-bottom:20px}
-#welcome-close{display:block;width:100%;padding:14px;background:var(--arc-black);color:var(--arc-white);border:none;font-size:15px;font-weight:700;font-family:var(--font-body);cursor:pointer;letter-spacing:.3px}
-#welcome-close:hover{background:var(--arc-gray-900)}
+#welcome-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px}
+#welcome-modal{background:#fff;border-top:3px solid #ED1B2E;padding:28px 24px;max-width:420px;width:100%}
+#welcome-modal h2{font-family:'Libre Baskerville',Georgia,serif;font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:16px}
+#welcome-modal p{font-size:15px;color:#4a4a4a;line-height:1.6;margin-bottom:12px}
+#welcome-modal p.highlight{font-style:italic;color:#737373;font-size:14px;margin-bottom:24px}
+#welcome-btn{display:block;width:100%;padding:14px;background:#1a1a1a;color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;letter-spacing:.3px}
+#welcome-btn:hover{background:#2d2d2d}
 </style>
 </head>
 <body>
 
-<div id="welcome-overlay" onclick="if(event.target===this)dismissWelcome()">
+<div id="welcome-overlay">
   <div id="welcome-modal">
     <h2>Welcome!</h2>
-    <p>Here are some of our favorite places. We're sure there are more. We really enjoyed walking around Soho, Mayfair, and Kensington.</p>
-    <p>The neighborhood south of London Bridge near the Tate Modern is great for exploring.</p>
-    <p class="tip">Highly recommend Sir John Soane's Museum in Holborn — eccentric and unmissable.</p>
-    <button id="welcome-close" onclick="dismissWelcome()">Explore the Guide</button>
+    <p>Here are some of our favourite places. We're sure there are more. We really enjoyed walking around Soho, Mayfair, and Kensington.</p>
+    <p>The neighbourhood south of London Bridge near the Tate Modern is great for exploring.</p>
+    <p class="highlight">Highly recommend the Courtauld Gallery on the Strand — stunning Van Goghs right on the Thames. And Sir John Soane's Museum in Holborn — eccentric and unmissable.</p>
+    <button id="welcome-btn" onclick="document.getElementById('welcome-overlay').style.display='none'">Explore the Guide</button>
   </div>
 </div>
 
@@ -189,6 +189,7 @@ const R=[
   {type:'site',name:"Garden at 120",area:"City of London",category:"Garden",note:"Rooftop garden, Fenchurch St",lat:51.5108,lng:-0.0839},
   {type:'site',name:"London Roman Amphitheatre",area:"Guildhall",category:"History",note:"Hidden beneath Guildhall Art Gallery",lat:51.5155,lng:-0.0921},
   {type:'site',name:"Sir John Soane's Museum",area:"Holborn",category:"Museum",note:"Eccentric & unmissable",lat:51.5174,lng:-0.1181},
+  {type:'site',name:"Courtauld Gallery",area:"Somerset House, Strand",category:"Museum",note:"Van Goghs & Impressionists — unmissable",lat:51.5117,lng:-0.1168},
   {type:'site',name:"Italian Gardens",area:"Hyde Park",category:"Garden",note:"Victorian ornamental fountains",lat:51.5130,lng:-0.1771},
   {type:'site',name:"Kensington Gardens",area:"Kensington",category:"Park",note:"Adjacent to Hyde Park",lat:51.5058,lng:-0.1812},
   {type:'site',name:"Regent's Park",area:"Regent's Park",category:"Park",note:"Open air theatre in summer",lat:51.5313,lng:-0.1570},
