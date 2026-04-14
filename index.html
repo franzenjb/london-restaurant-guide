@@ -2,88 +2,89 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>Tim and Mel's London Food Extravaganza</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tim and Mel's London Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+Pro:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root {
-  --arc-red: #ED1B2E; --arc-black: #1a1a1a; --arc-cream: #f7f5f2;
-  --arc-gray-900: #2d2d2d; --arc-gray-700: #4a4a4a; --arc-gray-500: #737373;
-  --arc-gray-300: #a3a3a3; --arc-gray-100: #e5e5e5; --arc-white: #fff;
-  --font-headline: 'Libre Baskerville', Georgia, serif;
-  --font-body: 'Source Sans Pro', 'Helvetica Neue', sans-serif;
-  --font-data: 'IBM Plex Mono', Consolas, monospace;
+  --arc-red:#ED1B2E;--arc-black:#1a1a1a;--arc-cream:#f7f5f2;
+  --arc-gray-900:#2d2d2d;--arc-gray-700:#4a4a4a;--arc-gray-500:#737373;
+  --arc-gray-300:#a3a3a3;--arc-gray-100:#e5e5e5;--arc-white:#fff;
+  --font-headline:'Libre Baskerville',Georgia,serif;
+  --font-body:'Source Sans Pro','Helvetica Neue',sans-serif;
+  --font-data:'IBM Plex Mono',Consolas,monospace;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--font-body); background: var(--arc-cream); color: var(--arc-gray-900); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-/* Header */
-header { background: var(--arc-black); padding: 54px 20px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.header-left { display: flex; align-items: center; gap: 12px; }
-header h1 { font-family: var(--font-headline); font-size: 20px; font-weight: 700; color: var(--arc-white); }
-header p { font-size: 12px; color: var(--arc-gray-300); margin-top: 1px; font-family: var(--font-data); }
-
-/* Tabs */
-#tabs { display: flex; background: var(--arc-white); border-bottom: 2px solid var(--arc-gray-100); flex-shrink: 0; }
-.tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--arc-gray-500); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: var(--font-body); letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.15s; }
-.tab.active { color: var(--arc-black); border-bottom: 3px solid var(--arc-black); }
-
-/* Views */
-#map-view, #list-view { flex: 1; overflow: hidden; display: none; flex-direction: column; }
-#map-view.active, #list-view.active { display: flex; }
-
-/* Map */
-#map-filter-bar { padding: 10px 16px; display: flex; gap: 8px; flex-wrap: wrap; background: var(--arc-white); border-bottom: 1px solid var(--arc-gray-100); flex-shrink: 0; }
-.mfb { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--arc-gray-300); background: transparent; color: var(--arc-gray-700); cursor: pointer; font-family: var(--font-body); transition: all 0.15s; }
-.mfb.on { background: var(--arc-black); color: var(--arc-white); border-color: var(--arc-black); }
-#map-wrap { flex: 1; position: relative; }
-#leaflet-map { width: 100%; height: 100%; }
-
-/* Map popup panel */
-#map-panel { display: none; position: absolute; bottom: 0; left: 0; right: 0; background: var(--arc-white); border-top: 3px solid var(--arc-black); padding: 20px; z-index: 1000; }
-#map-panel.open { display: block; }
-#mp-close { float: right; cursor: pointer; color: var(--arc-gray-500); font-size: 20px; line-height: 1; background: none; border: none; font-family: var(--font-body); }
-#mp-name { font-family: var(--font-headline); font-size: 20px; font-weight: 700; color: var(--arc-black); margin-bottom: 4px; }
-#mp-sub { font-size: 13px; color: var(--arc-gray-500); font-family: var(--font-data); margin-bottom: 4px; }
-#mp-note { font-size: 13px; color: var(--arc-gray-700); font-style: italic; margin-bottom: 16px; min-height: 4px; }
-.mp-btns { display: flex; gap: 10px; }
-.mp-btn { flex: 1; display: block; text-align: center; padding: 12px; text-decoration: none; font-size: 14px; font-weight: 700; font-family: var(--font-body); letter-spacing: 0.3px; }
-.mp-btn-primary { background: var(--arc-red); color: var(--arc-white); }
-.mp-btn-primary:hover { background: #c4151f; }
-.mp-btn-secondary { background: var(--arc-white); color: var(--arc-black); border: 2px solid var(--arc-black); }
-.mp-btn-secondary:hover { background: var(--arc-cream); }
-
-/* List */
-#list-filter-bar { padding: 10px 16px; display: flex; gap: 8px; flex-wrap: wrap; background: var(--arc-white); border-bottom: 1px solid var(--arc-gray-100); flex-shrink: 0; }
-.lfb { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--arc-gray-300); background: transparent; color: var(--arc-gray-700); cursor: pointer; font-family: var(--font-body); transition: all 0.15s; }
-.lfb.on { background: var(--arc-black); color: var(--arc-white); border-color: var(--arc-black); }
-#list-scroll { flex: 1; overflow-y: auto; }
-.sec-hdr { padding: 8px 16px; font-size: 11px; font-weight: 700; color: var(--arc-gray-500); background: var(--arc-cream); border-bottom: 1px solid var(--arc-gray-100); text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-data); }
-.row { padding: 12px 16px; border-bottom: 1px solid var(--arc-gray-100); display: flex; justify-content: space-between; align-items: center; background: var(--arc-white); }
-.row:hover { background: var(--arc-cream); }
-.rname { font-size: 15px; font-weight: 600; color: var(--arc-black); }
-.rmeta { font-size: 12px; color: var(--arc-gray-500); margin-top: 2px; font-family: var(--font-data); }
-.rtag { font-size: 11px; padding: 2px 8px; border-radius: 3px; font-family: var(--font-data); font-weight: 500; white-space: nowrap; }
-.maps-a { font-size: 12px; color: var(--arc-red); padding: 3px 10px; border: 1px solid var(--arc-red); text-decoration: none; font-weight: 600; margin-top: 4px; display: inline-block; font-family: var(--font-body); }
-.maps-a:hover { background: var(--arc-red); color: var(--arc-white); }
-
-/* Leaflet overrides */
-.leaflet-popup-content-wrapper { border-radius: 0; border: 2px solid var(--arc-black); font-family: var(--font-body); }
-.leaflet-popup-tip { display: none; }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--arc-cream); }
-::-webkit-scrollbar-thumb { background: var(--arc-gray-300); }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--arc-cream);color:var(--arc-gray-900);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--arc-black);padding:54px 20px 14px;flex-shrink:0}
+header h1{font-family:var(--font-headline);font-size:20px;font-weight:700;color:var(--arc-white)}
+header p{font-size:12px;color:var(--arc-gray-300);margin-top:1px;font-family:var(--font-data)}
+#tabs{display:flex;background:var(--arc-white);border-bottom:2px solid var(--arc-gray-100);flex-shrink:0}
+.tab{flex:1;padding:12px;text-align:center;font-size:13px;font-weight:600;color:var(--arc-gray-500);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
+.tab.active{color:var(--arc-black);border-bottom:3px solid var(--arc-black)}
+#map-view,#list-view{flex:1;overflow:hidden;display:none;flex-direction:column}
+#map-view.active,#list-view.active{display:flex}
+#map-filter-bar{padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;background:var(--arc-white);border-bottom:1px solid var(--arc-gray-100);flex-shrink:0}
+.mfb{font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1px solid var(--arc-gray-300);background:transparent;color:var(--arc-gray-700);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.mfb.on{background:var(--arc-black);color:var(--arc-white);border-color:var(--arc-black)}
+.mfb.sites-btn.on{background:#1a6e3c;border-color:#1a6e3c}
+#map-wrap{flex:1;position:relative}
+#leaflet-map{width:100%;height:100%}
+#map-panel{display:none;position:absolute;bottom:0;left:0;right:0;background:var(--arc-white);border-top:3px solid var(--arc-black);padding:20px;z-index:1000}
+#map-panel.open{display:block}
+#mp-close{float:right;cursor:pointer;color:var(--arc-gray-500);font-size:20px;line-height:1;background:none;border:none;font-family:var(--font-body)}
+#mp-name{font-family:var(--font-headline);font-size:20px;font-weight:700;color:var(--arc-black);margin-bottom:4px}
+#mp-sub{font-size:13px;color:var(--arc-gray-500);font-family:var(--font-data);margin-bottom:4px}
+#mp-note{font-size:13px;color:var(--arc-gray-700);font-style:italic;margin-bottom:16px;min-height:4px}
+.mp-btns{display:flex;gap:10px}
+.mp-btn{flex:1;display:block;text-align:center;padding:12px;text-decoration:none;font-size:14px;font-weight:700;font-family:var(--font-body);letter-spacing:.3px}
+.mp-btn-primary{background:var(--arc-red);color:var(--arc-white)}
+.mp-btn-primary:hover{background:#c4151f}
+.mp-btn-secondary{background:var(--arc-white);color:var(--arc-black);border:2px solid var(--arc-black)}
+.mp-btn-secondary:hover{background:var(--arc-cream)}
+#list-filter-bar{padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;background:var(--arc-white);border-bottom:1px solid var(--arc-gray-100);flex-shrink:0}
+.lfb{font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;border:1px solid var(--arc-gray-300);background:transparent;color:var(--arc-gray-700);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.lfb.on{background:var(--arc-black);color:var(--arc-white);border-color:var(--arc-black)}
+.lfb.sites-btn.on{background:#1a6e3c;border-color:#1a6e3c}
+.lfb.trips-btn.on{background:#7d3c98;border-color:#7d3c98}
+#list-scroll{flex:1;overflow-y:auto}
+.sec-hdr{padding:8px 16px;font-size:11px;font-weight:700;color:var(--arc-gray-500);background:var(--arc-cream);border-bottom:1px solid var(--arc-gray-100);text-transform:uppercase;letter-spacing:1px;font-family:var(--font-data)}
+.row{padding:12px 16px;border-bottom:1px solid var(--arc-gray-100);display:flex;justify-content:space-between;align-items:center;background:var(--arc-white)}
+.row:hover{background:var(--arc-cream)}
+.rname{font-size:15px;font-weight:600;color:var(--arc-black)}
+.rmeta{font-size:12px;color:var(--arc-gray-500);margin-top:2px;font-family:var(--font-data)}
+.rtag{font-size:11px;padding:2px 8px;border-radius:3px;font-family:var(--font-data);font-weight:500;white-space:nowrap}
+.maps-a{font-size:12px;color:var(--arc-red);padding:3px 10px;border:1px solid var(--arc-red);text-decoration:none;font-weight:600;margin-top:4px;display:inline-block;font-family:var(--font-body)}
+.maps-a:hover{background:var(--arc-red);color:var(--arc-white)}
+.day-trip-badge{font-size:11px;padding:2px 8px;background:#f0e6fa;color:#7d3c98;border-radius:3px;font-family:var(--font-data);font-weight:500}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--arc-cream)}
+::-webkit-scrollbar-thumb{background:var(--arc-gray-300)}
+#welcome-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px}
+#welcome-modal{background:var(--arc-white);max-width:380px;width:100%;border-top:4px solid var(--arc-red);padding:28px 24px 20px;position:relative}
+#welcome-modal h2{font-family:var(--font-headline);font-size:22px;font-weight:700;color:var(--arc-black);margin-bottom:16px}
+#welcome-modal p{font-size:14px;line-height:1.6;color:var(--arc-gray-700);margin-bottom:12px}
+#welcome-modal .tip{font-size:13px;color:var(--arc-gray-500);font-style:italic;margin-bottom:20px}
+#welcome-close{display:block;width:100%;padding:14px;background:var(--arc-black);color:var(--arc-white);border:none;font-size:15px;font-weight:700;font-family:var(--font-body);cursor:pointer;letter-spacing:.3px}
+#welcome-close:hover{background:var(--arc-gray-900)}
 </style>
 </head>
 <body>
 
+<div id="welcome-overlay" onclick="if(event.target===this)dismissWelcome()">
+  <div id="welcome-modal">
+    <h2>Welcome!</h2>
+    <p>Here are some of our favorite places. We're sure there are more. We really enjoyed walking around Soho, Mayfair, and Kensington.</p>
+    <p>The neighborhood south of London Bridge near the Tate Modern is great for exploring.</p>
+    <p class="tip">Highly recommend Sir John Soane's Museum in Holborn — eccentric and unmissable.</p>
+    <button id="welcome-close" onclick="dismissWelcome()">Explore the Guide</button>
+  </div>
+</div>
+
 <header>
-  <div class="header-left">
-    <div>
-      <h1>Tim & Mel · London Eats</h1>
-    </div>
+  <div>
+    <h1>Tim & Mel's London Guide</h1>
   </div>
 </header>
 
@@ -97,12 +98,12 @@ header p { font-size: 12px; color: var(--arc-gray-300); margin-top: 1px; font-fa
   <div id="map-wrap">
     <div id="leaflet-map"></div>
     <div id="map-panel">
-      <button id="mp-close" onclick="closePanel()">✕</button>
+      <button id="mp-close" onclick="closePanel()">&#x2715;</button>
       <div id="mp-name"></div>
       <div id="mp-sub"></div>
       <div id="mp-note"></div>
       <div class="mp-btns">
-        <a id="mp-directions" class="mp-btn mp-btn-primary" href="#" target="_blank">Get Directions →</a>
+        <a id="mp-directions" class="mp-btn mp-btn-primary" href="#" target="_blank">Get Directions &rarr;</a>
         <a id="mp-search" class="mp-btn mp-btn-secondary" href="#" target="_blank">Google It</a>
       </div>
     </div>
@@ -117,91 +118,117 @@ header p { font-size: 12px; color: var(--arc-gray-300); margin-top: 1px; font-fa
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const R=[
-  {name:"Cecconi's",area:"Mayfair",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:"",lat:51.5121,lng:-0.1449},
-  {name:"Claridge's",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:"",lat:51.5138,lng:-0.1477},
-  {name:"The Connaught",area:"Mayfair",cuisine:"European",meal:["breakfast"],note:"",lat:51.5107,lng:-0.1497},
-  {name:"Langan's Brasserie",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:"",lat:51.5099,lng:-0.1441},
-  {name:"The Wolseley",area:"Mayfair",cuisine:"British",meal:["breakfast","lunch","dinner"],note:"",lat:51.5074,lng:-0.1416},
-  {name:"Franco's",area:"St James's",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:"",lat:51.5066,lng:-0.1378},
-  {name:"Hjem",area:"Mayfair",cuisine:"Bakery",meal:["breakfast"],note:"Danish bakery",lat:51.5119,lng:-0.1452},
-  {name:"45 Jermyn St",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5071,lng:-0.1373},
-  {name:"Wilton's",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5069,lng:-0.1368},
-  {name:"Cantinetta Antinori",area:"Knightsbridge",cuisine:"Italian",meal:["lunch","dinner"],note:"",lat:51.5016,lng:-0.1608},
-  {name:"Scott's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5127,lng:-0.1474},
-  {name:"Pollen Street Social",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5118,lng:-0.1435},
-  {name:"Little Social",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5116,lng:-0.1436},
-  {name:"Barrafina",area:"Soho",cuisine:"Spanish",meal:["lunch","dinner"],note:"",lat:51.5133,lng:-0.1319},
-  {name:"Dinings",area:"Marylebone",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5196,lng:-0.1565},
-  {name:"Goodman",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:"",lat:51.5126,lng:-0.1468},
-  {name:"Benares",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5120,lng:-0.1461},
-  {name:"Tamarind",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5097,lng:-0.1441},
-  {name:"Kai",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5096,lng:-0.1477},
-  {name:"Zuma",area:"Knightsbridge",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5024,lng:-0.1624},
-  {name:"Roka",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5122,lng:-0.1458},
-  {name:"Sparrow",area:"London Bridge",cuisine:"Modern",meal:["lunch","dinner"],note:"",lat:51.5031,lng:-0.0862},
-  {name:"La Petite Maison",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5124,lng:-0.1469},
-  {name:"Maine",area:"Mayfair",cuisine:"American",meal:["lunch","dinner"],note:"",lat:51.5115,lng:-0.1448},
-  {name:"Grill at The Connaught",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5109,lng:-0.1499},
-  {name:"34 Mayfair",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5102,lng:-0.1485},
-  {name:"Gymkhana",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5116,lng:-0.1437},
-  {name:"Jamavar",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5119,lng:-0.1471},
-  {name:"Bibi",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"Modern Indian",lat:51.5114,lng:-0.1447},
-  {name:"Hakkasan",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5128,lng:-0.1476},
-  {name:"Novikov",area:"Mayfair",cuisine:"Asian/Italian",meal:["lunch","dinner"],note:"",lat:51.5103,lng:-0.1458},
-  {name:"Park Chinois",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5110,lng:-0.1465},
-  {name:"Sexy Fish",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5108,lng:-0.1462},
-  {name:"Quaglino's",area:"St James's",cuisine:"Modern European",meal:["lunch","dinner"],note:"",lat:51.5073,lng:-0.1393},
-  {name:"The Guinea Grill",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:"Traditional pub & pie",lat:51.5115,lng:-0.1491},
-  {name:"Bentley's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"Oyster bar",lat:51.5104,lng:-0.1406},
-  {name:"Meraki",area:"Fitzrovia",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5178,lng:-0.1428},
-  {name:"Gaia",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5106,lng:-0.1493},
-  {name:"Milo's",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5109,lng:-0.1440},
-  {name:"Ishbilia",area:"Belgravia",cuisine:"Lebanese",meal:["lunch","dinner"],note:"",lat:51.4976,lng:-0.1566},
-  {name:"Coya",area:"Mayfair",cuisine:"Peruvian",meal:["lunch","dinner"],note:"",lat:51.5072,lng:-0.1430},
-  {name:"Fishy Kitty",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5113,lng:-0.1443},
-  {name:"Mosimann's",area:"Belgravia",cuisine:"Modern European",meal:["lunch","dinner"],note:"Private dining club",lat:51.4968,lng:-0.1561},
-  {name:"Pétrus",area:"Belgravia",cuisine:"French",meal:["lunch","dinner"],note:"Gordon Ramsay",lat:51.4988,lng:-0.1558},
-  {name:"Aqua",area:"Mayfair",cuisine:"Modern European",meal:["lunch","dinner"],note:"",lat:51.5117,lng:-0.1440},
-  {name:"Norma",area:"Fitzrovia",cuisine:"Italian",meal:["lunch","dinner"],note:"Sicilian",lat:51.5182,lng:-0.1432},
-  {name:"Hatched",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5100,lng:-0.1443},
-  {name:"No. 22",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5098,lng:-0.1450},
-  {name:"Cut at 45 Park Lane",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:"Wolfgang Puck",lat:51.5072,lng:-0.1511},
-  {name:"Socca",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5112,lng:-0.1470},
-  {name:"Ginza",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:"Complimentary champagne",lat:51.5108,lng:-0.1455},
-  {name:"Mercado Mayfair",area:"Mayfair",cuisine:"Latin",meal:["lunch","dinner"],note:"",lat:51.5130,lng:-0.1480},
-  {name:"Italian Bear Chocolate",area:"Mayfair",cuisine:"Cafe",meal:["breakfast"],note:"Kids favourite",lat:51.5090,lng:-0.1430},
+  {type:'restaurant',name:"Cecconi's",area:"Mayfair",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:"",lat:51.5121,lng:-0.1449},
+  {type:'restaurant',name:"Claridge's",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:"",lat:51.5138,lng:-0.1477},
+  {type:'restaurant',name:"The Connaught",area:"Mayfair",cuisine:"European",meal:["breakfast"],note:"",lat:51.5107,lng:-0.1497},
+  {type:'restaurant',name:"Langan's Brasserie",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:"",lat:51.5099,lng:-0.1441},
+  {type:'restaurant',name:"The Wolseley",area:"Mayfair",cuisine:"British",meal:["breakfast","lunch","dinner"],note:"",lat:51.5074,lng:-0.1416},
+  {type:'restaurant',name:"Franco's",area:"St James's",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:"",lat:51.5066,lng:-0.1378},
+  {type:'restaurant',name:"Hjem",area:"Mayfair",cuisine:"Bakery",meal:["breakfast"],note:"Danish bakery",lat:51.5119,lng:-0.1452},
+  {type:'restaurant',name:"45 Jermyn St",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5071,lng:-0.1373},
+  {type:'restaurant',name:"Wilton's",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5069,lng:-0.1368},
+  {type:'restaurant',name:"Cantinetta Antinori",area:"Knightsbridge",cuisine:"Italian",meal:["lunch","dinner"],note:"",lat:51.5016,lng:-0.1608},
+  {type:'restaurant',name:"Scott's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5127,lng:-0.1474},
+  {type:'restaurant',name:"Pollen Street Social",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5118,lng:-0.1435},
+  {type:'restaurant',name:"Little Social",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5116,lng:-0.1436},
+  {type:'restaurant',name:"Barrafina",area:"Soho",cuisine:"Spanish",meal:["lunch","dinner"],note:"",lat:51.5133,lng:-0.1319},
+  {type:'restaurant',name:"Dinings",area:"Marylebone",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5196,lng:-0.1565},
+  {type:'restaurant',name:"Goodman",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:"",lat:51.5126,lng:-0.1468},
+  {type:'restaurant',name:"Benares",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5120,lng:-0.1461},
+  {type:'restaurant',name:"Tamarind",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5097,lng:-0.1441},
+  {type:'restaurant',name:"Kai",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5096,lng:-0.1477},
+  {type:'restaurant',name:"Zuma",area:"Knightsbridge",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5024,lng:-0.1624},
+  {type:'restaurant',name:"Roka",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:"",lat:51.5122,lng:-0.1458},
+  {type:'restaurant',name:"Sparrow",area:"London Bridge",cuisine:"Modern",meal:["lunch","dinner"],note:"",lat:51.5031,lng:-0.0862},
+  {type:'restaurant',name:"La Petite Maison",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5124,lng:-0.1469},
+  {type:'restaurant',name:"Maine",area:"Mayfair",cuisine:"American",meal:["lunch","dinner"],note:"",lat:51.5115,lng:-0.1448},
+  {type:'restaurant',name:"Grill at The Connaught",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:"",lat:51.5109,lng:-0.1499},
+  {type:'restaurant',name:"34 Mayfair",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5102,lng:-0.1485},
+  {type:'restaurant',name:"Gymkhana",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5116,lng:-0.1437},
+  {type:'restaurant',name:"Jamavar",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"",lat:51.5119,lng:-0.1471},
+  {type:'restaurant',name:"Bibi",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"Modern Indian",lat:51.5114,lng:-0.1447},
+  {type:'restaurant',name:"Hakkasan",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5128,lng:-0.1476},
+  {type:'restaurant',name:"Novikov",area:"Mayfair",cuisine:"Asian/Italian",meal:["lunch","dinner"],note:"",lat:51.5103,lng:-0.1458},
+  {type:'restaurant',name:"Park Chinois",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:"",lat:51.5110,lng:-0.1465},
+  {type:'restaurant',name:"Sexy Fish",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5108,lng:-0.1462},
+  {type:'restaurant',name:"Quaglino's",area:"St James's",cuisine:"Modern European",meal:["lunch","dinner"],note:"",lat:51.5073,lng:-0.1393},
+  {type:'restaurant',name:"The Guinea Grill",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:"Traditional pub & pie",lat:51.5115,lng:-0.1491},
+  {type:'restaurant',name:"Bentley's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"Oyster bar",lat:51.5104,lng:-0.1406},
+  {type:'restaurant',name:"Meraki",area:"Fitzrovia",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5178,lng:-0.1428},
+  {type:'restaurant',name:"Gaia",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5106,lng:-0.1493},
+  {type:'restaurant',name:"Milo's",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:"",lat:51.5109,lng:-0.1440},
+  {type:'restaurant',name:"Ishbilia",area:"Belgravia",cuisine:"Lebanese",meal:["lunch","dinner"],note:"",lat:51.4976,lng:-0.1566},
+  {type:'restaurant',name:"Coya",area:"Mayfair",cuisine:"Peruvian",meal:["lunch","dinner"],note:"",lat:51.5072,lng:-0.1430},
+  {type:'restaurant',name:"Fishy Kitty",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"",lat:51.5113,lng:-0.1443},
+  {type:'restaurant',name:"Mosimann's",area:"Belgravia",cuisine:"Modern European",meal:["lunch","dinner"],note:"Private dining club",lat:51.4968,lng:-0.1561},
+  {type:'restaurant',name:"Petrus",area:"Belgravia",cuisine:"French",meal:["lunch","dinner"],note:"Gordon Ramsay",lat:51.4988,lng:-0.1558},
+  {type:'restaurant',name:"Aqua",area:"Mayfair",cuisine:"Modern European",meal:["lunch","dinner"],note:"",lat:51.5117,lng:-0.1440},
+  {type:'restaurant',name:"Norma",area:"Fitzrovia",cuisine:"Italian",meal:["lunch","dinner"],note:"Sicilian",lat:51.5182,lng:-0.1432},
+  {type:'restaurant',name:"Hatched",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5100,lng:-0.1443},
+  {type:'restaurant',name:"No. 22",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5098,lng:-0.1450},
+  {type:'restaurant',name:"Cut at 45 Park Lane",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:"Wolfgang Puck",lat:51.5072,lng:-0.1511},
+  {type:'restaurant',name:"Socca",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:"",lat:51.5112,lng:-0.1470},
+  {type:'restaurant',name:"Ginza",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:"Complimentary champagne",lat:51.5108,lng:-0.1455},
+  {type:'restaurant',name:"Mercado Mayfair",area:"Mayfair",cuisine:"Latin",meal:["lunch","dinner"],note:"",lat:51.5130,lng:-0.1480},
+  {type:'restaurant',name:"Italian Bear Chocolate",area:"Mayfair",cuisine:"Cafe",meal:["breakfast"],note:"Kids favourite",lat:51.5090,lng:-0.1430},
+  {type:'restaurant',name:"Lemonia",area:"Primrose Hill",cuisine:"Greek",meal:["lunch","dinner"],note:"Near Regent's Park",lat:51.5390,lng:-0.1602},
+  {type:'restaurant',name:"Julie's Restaurant",area:"Holland Park",cuisine:"Modern British",meal:["lunch","dinner"],note:"",lat:51.5077,lng:-0.2108},
+  {type:'restaurant',name:"Olivio",area:"Belgravia",cuisine:"Italian",meal:["lunch","dinner"],note:"",lat:51.4944,lng:-0.1497},
+  {type:'restaurant',name:"Barley & Sage",area:"Notting Hill",cuisine:"Market",meal:["breakfast","lunch"],note:"Artisan food market",lat:51.5074,lng:-0.1965},
+  {type:'restaurant',name:"Daylesford Organic",area:"Pimlico",cuisine:"Organic",meal:["breakfast","lunch"],note:"Farm shop & cafe",lat:51.4908,lng:-0.1442},
+
+  {type:'site',name:"Tate Modern",area:"Bankside",category:"Museum",note:"World-class modern art",lat:51.5076,lng:-0.0994},
+  {type:'site',name:"Churchill War Rooms",area:"Westminster",category:"Museum",note:"Underground wartime HQ",lat:51.5021,lng:-0.1291},
+  {type:'site',name:"National Gallery",area:"Trafalgar Square",category:"Museum",note:"European masterpieces",lat:51.5089,lng:-0.1283},
+  {type:'site',name:"National Portrait Gallery",area:"Trafalgar Square",category:"Museum",note:"Newly renovated",lat:51.5094,lng:-0.1280},
+  {type:'site',name:"Victoria & Albert Museum",area:"South Kensington",category:"Museum",note:"Art & design",lat:51.4966,lng:-0.1722},
+  {type:'site',name:"Royal Botanic Gardens (Kew)",area:"Kew",category:"Garden",note:"UNESCO World Heritage",lat:51.4787,lng:-0.2956},
+  {type:'site',name:"Chelsea Flower Show",area:"Chelsea",category:"Garden",note:"Annual May event, Royal Hospital",lat:51.4878,lng:-0.1574},
+  {type:'site',name:"Tate Britain",area:"Millbank",category:"Museum",note:"British art from 1500s",lat:51.4913,lng:-0.1276},
+  {type:'site',name:"Sky Garden",area:"City of London",category:"Views",note:"Free entry, book ahead",lat:51.5112,lng:-0.0836},
+  {type:'site',name:"Garden at 120",area:"City of London",category:"Garden",note:"Rooftop garden, Fenchurch St",lat:51.5108,lng:-0.0839},
+  {type:'site',name:"London Roman Amphitheatre",area:"Guildhall",category:"History",note:"Hidden beneath Guildhall Art Gallery",lat:51.5155,lng:-0.0921},
+  {type:'site',name:"Sir John Soane's Museum",area:"Holborn",category:"Museum",note:"Eccentric & unmissable",lat:51.5174,lng:-0.1181},
+  {type:'site',name:"Italian Gardens",area:"Hyde Park",category:"Garden",note:"Victorian ornamental fountains",lat:51.5130,lng:-0.1771},
+  {type:'site',name:"Kensington Gardens",area:"Kensington",category:"Park",note:"Adjacent to Hyde Park",lat:51.5058,lng:-0.1812},
+  {type:'site',name:"Regent's Park",area:"Regent's Park",category:"Park",note:"Open air theatre in summer",lat:51.5313,lng:-0.1570},
+  {type:'site',name:"Churchill Arms",area:"Kensington",category:"Pub",note:"Famous flower-covered facade",lat:51.5046,lng:-0.1942},
+  {type:'site',name:"Battersea Power Station",area:"Battersea",category:"Shopping",note:"Stunning arts & retail complex",lat:51.4836,lng:-0.1444},
 ];
 
-const COLORS={
-  "Italian":"#c0392b","British":"#1a5276","French":"#6c3483","Indian":"#d35400",
-  "Japanese":"#0e6655","Chinese":"#922b21","Greek":"#1e8449","Seafood":"#1f618d",
-  "Steakhouse":"#641e16","Modern British":"#154360","Modern European":"#4a235a",
-  "European":"#1b4f72","Bakery":"#784212","Spanish":"#7d6608","Lebanese":"#6e2f0a",
-  "Peruvian":"#145a32","Asian/Italian":"#512e5f","American":"#212f3c",
-  "Latin":"#78281f","Cafe":"#4d2600","Modern":"#0b3d2e"
-};
+const DAYTRIPS=[
+  {name:"Daylesford Organic — Cotswolds",note:"The original farm shop, worth the drive",search:"Daylesford Organic Farm Cotswolds"},
+  {name:"Oxford",note:"University city, 1hr by train from Paddington",search:"Oxford city centre"},
+  {name:"Bath",note:"Roman baths, Georgian architecture, 1.5hr by train",search:"Bath city centre"},
+  {name:"Lacock Village",note:"Medieval village, used in period dramas",search:"Lacock Village Wiltshire"},
+  {name:"Bicester Village",note:"High-end designer outlet, 45min train from Marylebone",search:"Bicester Village outlet"},
+  {name:"Epping Forest",note:"Ancient royal forest, 30min from central London",search:"Epping Forest London"},
+];
 
-function mapsUrl(r){return`https://www.google.com/maps/search/${encodeURIComponent(r.name+' restaurant '+r.area+' London')}`;}
+const RCOLORS={"Italian":"#c0392b","British":"#1a5276","French":"#6c3483","Indian":"#d35400","Japanese":"#0e6655","Chinese":"#922b21","Greek":"#1e8449","Seafood":"#1f618d","Steakhouse":"#641e16","Modern British":"#154360","Modern European":"#4a235a","European":"#1b4f72","Bakery":"#784212","Spanish":"#7d6608","Lebanese":"#6e2f0a","Peruvian":"#145a32","Asian/Italian":"#512e5f","American":"#212f3c","Latin":"#78281f","Cafe":"#4d2600","Modern":"#0b3d2e","Market":"#7d6608","Organic":"#2d5a27"};
+const SCOLORS={"Museum":"#1a5276","Garden":"#1a6e3c","Park":"#276221","Views":"#7d3c98","History":"#784212","Pub":"#a93226","Shopping":"#b7950b"};
 
-let map, markers=[], mapFilter='all', listFilter='all';
+function dirUrl(r){return`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(r.name+' '+r.area+' London')}`;}
+function searchUrl(r){return`https://www.google.com/search?q=${encodeURIComponent(r.name+' London')}`;}
+function mapsUrl(r){return`https://www.google.com/maps/search/${encodeURIComponent(r.name+' '+r.area+' London')}`;}
+
+let map,markers=[],mapFilter='all',listFilter='all';
 
 function initMap(){
-  map=L.map('leaflet-map',{center:[51.508,-0.145],zoom:14});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>'
-  }).addTo(map);
+  map=L.map('leaflet-map',{center:[51.505,-0.13],zoom:13});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>'}).addTo(map);
   plotMarkers();
 }
 
+function dotColor(r){return r.type==='site'?SCOLORS[r.category]||'#1a6e3c':RCOLORS[r.cuisine]||'#555';}
+
 function plotMarkers(){
-  markers.forEach(m=>map.removeLayer(m));
-  markers=[];
-  R.filter(r=>mapFilter==='all'||r.meal.includes(mapFilter)).forEach(r=>{
-    const c=COLORS[r.cuisine]||'#555';
-    const icon=L.divIcon({
-      html:`<div style="width:14px;height:14px;border-radius:50%;background:${c};border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.5)"></div>`,
-      iconSize:[14,14],iconAnchor:[7,7],className:''
-    });
+  markers.forEach(m=>map.removeLayer(m));markers=[];
+  let data=mapFilter==='sites'?R.filter(r=>r.type==='site'):mapFilter==='all'?R:R.filter(r=>r.type==='restaurant'&&r.meal&&r.meal.includes(mapFilter));
+  data.forEach(r=>{
+    const c=dotColor(r),isSite=r.type==='site';
+    const sz=isSite?16:13,rd=isSite?'3px':'50%';
+    const icon=L.divIcon({html:`<div style="width:${sz}px;height:${sz}px;border-radius:${rd};background:${c};border:2.5px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.5)"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],className:''});
     const m=L.marker([r.lat,r.lng],{icon}).addTo(map);
     m.on('click',()=>showPanel(r));
     markers.push(m);
@@ -210,49 +237,58 @@ function plotMarkers(){
 
 function showPanel(r){
   document.getElementById('mp-name').textContent=r.name;
-  document.getElementById('mp-sub').textContent=r.cuisine+' · '+r.area+' · '+r.meal.map(m=>m[0].toUpperCase()+m.slice(1)).join(', ');
+  document.getElementById('mp-sub').textContent=r.type==='site'?(r.category+' · '+r.area):(r.cuisine+' · '+r.area+(r.meal?' · '+r.meal.map(m=>m[0].toUpperCase()+m.slice(1)).join(', '):''));
   document.getElementById('mp-note').textContent=r.note||'';
-  document.getElementById('mp-directions').href=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(r.name+' '+r.area+' London')}`;
-  document.getElementById('mp-search').href=`https://www.google.com/search?q=${encodeURIComponent(r.name+' restaurant London')}`;
+  document.getElementById('mp-directions').href=dirUrl(r);
+  document.getElementById('mp-search').href=searchUrl(r);
   document.getElementById('map-panel').classList.add('open');
 }
 
 function closePanel(){document.getElementById('map-panel').classList.remove('open');}
 
 function buildMapFilters(){
-  const bar=document.getElementById('map-filter-bar');
-  bar.innerHTML=['all','breakfast','lunch','dinner'].map(f=>
-    `<button class="mfb ${mapFilter===f?'on':''}" onclick="setMapFilter('${f}')">${f==='all'?'All':f[0].toUpperCase()+f.slice(1)}</button>`
+  document.getElementById('map-filter-bar').innerHTML=['all','breakfast','lunch','dinner','sites'].map(f=>
+    `<button class="mfb ${f==='sites'?'sites-btn':''} ${mapFilter===f?'on':''}" onclick="setMapFilter('${f}')">${f==='all'?'All':f[0].toUpperCase()+f.slice(1)}</button>`
   ).join('');
 }
 
 function setMapFilter(f){mapFilter=f;buildMapFilters();plotMarkers();}
 
 function buildList(){
-  const bar=document.getElementById('list-filter-bar');
-  bar.innerHTML=['all','breakfast','lunch','dinner'].map(f=>
-    `<button class="lfb ${listFilter===f?'on':''}" onclick="setListFilter('${f}')">${f==='all'?'All':f[0].toUpperCase()+f.slice(1)}</button>`
-  ).join('');
-  const filtered=listFilter==='all'?R:R.filter(r=>r.meal.includes(listFilter));
-  const grouped={};
-  filtered.forEach(r=>{if(!grouped[r.area])grouped[r.area]=[];grouped[r.area].push(r);});
+  document.getElementById('list-filter-bar').innerHTML=['all','breakfast','lunch','dinner','sites','daytrips'].map(f=>{
+    const cls=f==='sites'?'sites-btn':f==='daytrips'?'trips-btn':'';
+    const label=f==='all'?'All':f==='daytrips'?'Day Trips':f[0].toUpperCase()+f.slice(1);
+    return `<button class="lfb ${cls} ${listFilter===f?'on':''}" onclick="setListFilter('${f}')">${label}</button>`;
+  }).join('');
+
   let html='';
-  Object.keys(grouped).sort().forEach(area=>{
-    html+=`<div class="sec-hdr">${area}</div>`;
-    grouped[area].forEach(r=>{
-      const c=COLORS[r.cuisine]||'#555';
-      html+=`<div class="row">
-        <div style="flex:1">
-          <div class="rname">${r.name}</div>
-          <div class="rmeta">${r.meal.map(m=>m[0].toUpperCase()+m.slice(1)).join(' · ')}${r.note?' · '+r.note:''}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px">
-          <span class="rtag" style="background:${c}18;color:${c}">${r.cuisine}</span>
-          <a class="maps-a" href="${mapsUrl(r)}" target="_blank">Map</a>
-        </div>
-      </div>`;
+  if(listFilter==='daytrips'){
+    html+='<div class="sec-hdr">Day Trips from London</div>';
+    DAYTRIPS.forEach(d=>{
+      html+=`<div class="row"><div style="flex:1"><div class="rname">${d.name}</div><div class="rmeta">${d.note}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px"><span class="day-trip-badge">Day Trip</span><a class="maps-a" href="https://www.google.com/search?q=${encodeURIComponent(d.search)}" target="_blank">Google It</a></div></div>`;
     });
-  });
+  } else if(listFilter==='sites'){
+    const grouped={};
+    R.filter(r=>r.type==='site').forEach(r=>{if(!grouped[r.category])grouped[r.category]=[];grouped[r.category].push(r);});
+    Object.keys(grouped).sort().forEach(cat=>{
+      html+=`<div class="sec-hdr">${cat}</div>`;
+      grouped[cat].forEach(r=>{
+        const c=SCOLORS[r.category]||'#1a6e3c';
+        html+=`<div class="row"><div style="flex:1"><div class="rname">${r.name}</div><div class="rmeta">${r.area}${r.note?' · '+r.note:''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px"><span class="rtag" style="background:${c}18;color:${c}">${r.category}</span><a class="maps-a" href="${mapsUrl(r)}" target="_blank">Map</a></div></div>`;
+      });
+    });
+  } else {
+    const data=listFilter==='all'?R.filter(r=>r.type==='restaurant'):R.filter(r=>r.type==='restaurant'&&r.meal&&r.meal.includes(listFilter));
+    const grouped={};
+    data.forEach(r=>{if(!grouped[r.area])grouped[r.area]=[];grouped[r.area].push(r);});
+    Object.keys(grouped).sort().forEach(area=>{
+      html+=`<div class="sec-hdr">${area}</div>`;
+      grouped[area].forEach(r=>{
+        const c=RCOLORS[r.cuisine]||'#555';
+        html+=`<div class="row"><div style="flex:1"><div class="rname">${r.name}</div><div class="rmeta">${r.meal?r.meal.map(m=>m[0].toUpperCase()+m.slice(1)).join(' · '):''}${r.note?' · '+r.note:''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:12px"><span class="rtag" style="background:${c}18;color:${c}">${r.cuisine}</span><a class="maps-a" href="${mapsUrl(r)}" target="_blank">Map</a></div></div>`;
+      });
+    });
+  }
   document.getElementById('list-scroll').innerHTML=html;
 }
 
@@ -265,6 +301,8 @@ function switchTab(t){
   if(t==='list')buildList();
   if(t==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
 }
+
+function dismissWelcome(){document.getElementById('welcome-overlay').style.display='none';}
 
 buildMapFilters();
 initMap();
