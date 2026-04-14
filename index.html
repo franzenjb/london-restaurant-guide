@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>London Restaurant Guide</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #222; }
+.app { max-width: 420px; margin: 0 auto; padding: 0; background: #fff; min-height: 100vh; }
+.header { background: #1a1a1a; color: white; padding: 16px; }
+.header h1 { font-size: 18px; font-weight: 500; }
+.header p { font-size: 12px; color: #aaa; margin-top: 2px; }
+.filters { padding: 12px; background: #fafafa; display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 0.5px solid #e5e5e5; }
+.filter-btn { font-size: 12px; padding: 5px 10px; border-radius: 20px; border: 0.5px solid #ddd; background: #fff; color: #222; cursor: pointer; transition: all 0.15s; }
+.filter-btn.active { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+.list { overflow-y: auto; }
+.section-header { padding: 8px 14px; font-size: 11px; font-weight: 500; color: #888; background: #fafafa; border-bottom: 0.5px solid #e5e5e5; letter-spacing: 0.05em; text-transform: uppercase; }
+.item { padding: 12px 14px; border-bottom: 0.5px solid #e5e5e5; cursor: pointer; transition: background 0.1s; display: flex; justify-content: space-between; align-items: center; }
+.item:hover { background: #fafafa; }
+.item-left { flex: 1; }
+.item-name { font-size: 14px; font-weight: 500; color: #222; }
+.item-meta { font-size: 12px; color: #888; margin-top: 2px; }
+.item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.cuisine-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.maps-btn { font-size: 11px; color: #1a6ef5; text-decoration: none; padding: 3px 8px; border: 0.5px solid #1a6ef5; border-radius: 10px; white-space: nowrap; }
+.maps-btn:hover { background: #1a6ef5; color: white; }
+.detail-panel { display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 420px; background: #fff; border: 0.5px solid #e5e5e5; border-radius: 12px 12px 0 0; padding: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); z-index: 100; max-width: 100%; }
+.detail-panel.open { display: block; }
+.detail-close { float: right; cursor: pointer; color: #888; font-size: 18px; line-height: 1; }
+.detail-name { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+.detail-sub { font-size: 13px; color: #888; margin-bottom: 16px; }
+.detail-note { font-size: 13px; color: #888; font-style: italic; margin-bottom: 16px; }
+.open-maps { display: block; text-align: center; padding: 12px; background: #1a6ef5; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; }
+.open-maps:hover { background: #1459cc; }
+.no-results { padding: 40px 20px; text-align: center; color: #888; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>London Restaurants</h1>
+    <p>Dragon's curated guide &middot; 50+ spots</p>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<div class="detail-panel" id="panel">
+  <span class="detail-close" onclick="closePanel()">&#10005;</span>
+  <div class="detail-name" id="p-name"></div>
+  <div class="detail-sub" id="p-sub"></div>
+  <div class="detail-note" id="p-note"></div>
+  <a class="open-maps" id="p-link" href="#" target="_blank">Open in Google Maps &rarr;</a>
+</div>
+
+<script>
+const restaurants = [
+  {name:"Cecconi's",area:"Mayfair",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:""},
+  {name:"Claridge's",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:""},
+  {name:"The Connaught",area:"Mayfair",cuisine:"European",meal:["breakfast"],note:""},
+  {name:"Langan's Brasserie",area:"Mayfair",cuisine:"British",meal:["breakfast"],note:""},
+  {name:"The Wolseley",area:"Mayfair",cuisine:"British",meal:["breakfast","lunch","dinner"],note:""},
+  {name:"Franco's",area:"St James's",cuisine:"Italian",meal:["breakfast","lunch","dinner"],note:""},
+  {name:"Hjem",area:"Mayfair",cuisine:"Bakery",meal:["breakfast"],note:"Danish bakery"},
+  {name:"45 Jermyn St",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:""},
+  {name:"Wilton's",area:"St James's",cuisine:"British",meal:["lunch","dinner"],note:""},
+  {name:"Cantinetta Antinori",area:"Knightsbridge",cuisine:"Italian",meal:["lunch","dinner"],note:""},
+  {name:"Scott's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:""},
+  {name:"Pollen Street Social",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:""},
+  {name:"Little Social",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:""},
+  {name:"Barrafina",area:"Soho",cuisine:"Spanish",meal:["lunch","dinner"],note:""},
+  {name:"Dinings",area:"Marylebone",cuisine:"Japanese",meal:["lunch","dinner"],note:""},
+  {name:"Goodman",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:""},
+  {name:"Benares",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:""},
+  {name:"Tamarind",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:""},
+  {name:"Kai",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:""},
+  {name:"Zuma",area:"Knightsbridge",cuisine:"Japanese",meal:["lunch","dinner"],note:""},
+  {name:"Roka",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:""},
+  {name:"Sparrow",area:"London",cuisine:"Modern",meal:["lunch","dinner"],note:""},
+  {name:"La Petite Maison",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:""},
+  {name:"Maine",area:"Mayfair",cuisine:"American",meal:["lunch","dinner"],note:""},
+  {name:"Grill at The Connaught",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:""},
+  {name:"34 Mayfair",area:"Mayfair",cuisine:"Modern British",meal:["lunch","dinner"],note:""},
+  {name:"Gymkhana",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:""},
+  {name:"Jamavar",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:""},
+  {name:"Bibi",area:"Mayfair",cuisine:"Indian",meal:["lunch","dinner"],note:"Modern Indian"},
+  {name:"Hakkasan",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:""},
+  {name:"Novikov",area:"Mayfair",cuisine:"Asian/Italian",meal:["lunch","dinner"],note:"Asian fusion or Italian"},
+  {name:"Park Chinois",area:"Mayfair",cuisine:"Chinese",meal:["lunch","dinner"],note:""},
+  {name:"Sexy Fish",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:""},
+  {name:"Quaglino's",area:"St James's",cuisine:"Modern European",meal:["lunch","dinner"],note:""},
+  {name:"The Guinea Grill",area:"Mayfair",cuisine:"British",meal:["lunch","dinner"],note:"Traditional English pub & pie"},
+  {name:"Bentley's",area:"Mayfair",cuisine:"Seafood",meal:["lunch","dinner"],note:"Oyster bar"},
+  {name:"Meraki",area:"Fitzrovia",cuisine:"Greek",meal:["lunch","dinner"],note:""},
+  {name:"Gaia",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:""},
+  {name:"Milo's",area:"Mayfair",cuisine:"Greek",meal:["lunch","dinner"],note:""},
+  {name:"Ishbilia",area:"Belgravia",cuisine:"Lebanese",meal:["lunch","dinner"],note:""},
+  {name:"Coya",area:"Mayfair",cuisine:"Peruvian",meal:["lunch","dinner"],note:""},
+  {name:"Fishy Kitty",area:"London",cuisine:"Seafood",meal:["lunch","dinner"],note:""},
+  {name:"Mosimann's",area:"Belgravia",cuisine:"Modern European",meal:["lunch","dinner"],note:"Private dining club"},
+  {name:"P\u00e9trus",area:"Belgravia",cuisine:"French",meal:["lunch","dinner"],note:"Gordon Ramsay"},
+  {name:"Aqua",area:"Mayfair",cuisine:"Modern European",meal:["lunch","dinner"],note:""},
+  {name:"Norma",area:"Fitzrovia",cuisine:"Italian",meal:["lunch","dinner"],note:"Sicilian"},
+  {name:"Hatched",area:"London",cuisine:"Modern British",meal:["lunch","dinner"],note:""},
+  {name:"No. 22",area:"London",cuisine:"Modern British",meal:["lunch","dinner"],note:""},
+  {name:"Cut at 45 Park Lane",area:"Mayfair",cuisine:"Steakhouse",meal:["lunch","dinner"],note:"Wolfgang Puck"},
+  {name:"Socca",area:"Mayfair",cuisine:"French",meal:["lunch","dinner"],note:""},
+  {name:"Ginza",area:"Mayfair",cuisine:"Japanese",meal:["lunch","dinner"],note:"Complimentary glass of champagne"},
+  {name:"Mercado Mayfair",area:"Mayfair",cuisine:"Latin",meal:["lunch","dinner"],note:""},
+  {name:"Italian Bear Chocolate",area:"London",cuisine:"Cafe",meal:["breakfast"],note:"Kids favourite"},
+];
+
+const cuisineColors = {
+  "Italian":"#e8f4fd","British":"#fdf3e8","French":"#f0fde8","Indian":"#fde8f4",
+  "Japanese":"#ede8fd","Chinese":"#fde8e8","Greek":"#e8fdf0","Seafood":"#e8f8fd",
+  "Steakhouse":"#fde8e8","Modern British":"#f5f5e8","Modern European":"#ede8fd",
+  "European":"#fdf3e8","Bakery":"#fde8d0","Spanish":"#fde8c8","Lebanese":"#fdecd8",
+  "Peruvian":"#e8fde8","Asian/Italian":"#f0e8fd","American":"#e8eafd",
+  "Latin":"#fde8f0","Cafe":"#fde8d0","Modern":"#e8fdfd"
+};
+
+let activeFilter = "all";
+
+function mapsUrl(name, area) {
+  return `https://www.google.com/maps/search/${encodeURIComponent(name + ' restaurant ' + area + ' London')}`;
+}
+
+function render() {
+  const filters = document.getElementById("filters");
+  const list = document.getElementById("list");
+
+  const meals = ["all","breakfast","lunch","dinner"];
+  filters.innerHTML = meals.map(m =>
+    `<button class="filter-btn ${activeFilter===m?'active':''}" onclick="setFilter('${m}')">${m==='all'?'All':m.charAt(0).toUpperCase()+m.slice(1)}</button>`
+  ).join('');
+
+  let filtered = activeFilter === "all" ? restaurants : restaurants.filter(r => r.meal.includes(activeFilter));
+
+  let html = "";
+  if (filtered.length === 0) {
+    html = `<div class="no-results">No restaurants found</div>`;
+  } else {
+    const grouped = {};
+    filtered.forEach(r => {
+      const key = r.area;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(r);
+    });
+    Object.keys(grouped).sort().forEach(area => {
+      html += `<div class="section-header">${area}</div>`;
+      grouped[area].forEach(r => {
+        const color = cuisineColors[r.cuisine] || "#f5f5f5";
+        html += `<div class="item" onclick="openPanel('${r.name.replace(/'/g,"\\'")}')">
+          <div class="item-left">
+            <div class="item-name">${r.name}</div>
+            <div class="item-meta">${r.meal.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(' &middot; ')}${r.note?' &middot; '+r.note:''}</div>
+          </div>
+          <div class="item-right">
+            <span class="cuisine-tag" style="background:${color};color:#333;">${r.cuisine}</span>
+            <a class="maps-btn" href="${mapsUrl(r.name,r.area)}" target="_blank" onclick="event.stopPropagation()">Map</a>
+          </div>
+        </div>`;
+      });
+    });
+  }
+  list.innerHTML = html;
+}
+
+function setFilter(f) { activeFilter = f; render(); }
+
+function openPanel(name) {
+  const r = restaurants.find(x => x.name === name);
+  if (!r) return;
+  document.getElementById("p-name").textContent = r.name;
+  document.getElementById("p-sub").textContent = r.cuisine + " \u00b7 " + r.area + " \u00b7 " + r.meal.map(m=>m.charAt(0).toUpperCase()+m.slice(1)).join(", ");
+  document.getElementById("p-note").textContent = r.note || "";
+  document.getElementById("p-link").href = mapsUrl(r.name, r.area);
+  document.getElementById("panel").classList.add("open");
+}
+
+function closePanel() {
+  document.getElementById("panel").classList.remove("open");
+}
+
+render();
+</script>
+</body>
+</html>
